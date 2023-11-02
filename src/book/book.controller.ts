@@ -5,7 +5,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiQuery, } from '@nestjs/swagger';
 
 @ApiTags('book')
 @UseGuards(AuthGuard('jwt'))
@@ -21,10 +21,13 @@ export class BookController {
      */
     @Get()
     @ApiOperation({ summary: 'Obtener lista de libros' })
+    @ApiQuery({ name: 'keyword', required: false, type: String, description: 'Palabra clave a buscar', example: 'Book 8' })
+    @ApiQuery({ name: 'page', required: false, type: Number, description: 'Página a mostrar', example: 1 })
     @ApiResponse({
         status: 200,
         description: 'Lista de libros'
     })
+
     async getAllBooks(@Query() query: ExpressQuery): Promise<Book[]> {
         return this.bookService.findAll(query);
     }
@@ -48,7 +51,6 @@ export class BookController {
     book: CreateBookDto,
         @Req() req,
     ): Promise<Book> {
-
         return this.bookService.create(book, req.user);
     }
 
